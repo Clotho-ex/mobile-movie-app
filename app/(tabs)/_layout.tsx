@@ -1,45 +1,145 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import React from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+const CustomTabBar = ({ state, descriptors, navigation }: any) => {
+  return (
+    <View style={styles.tabBarContainer}>
+      <View style={styles.tabBar}>
+        {state.routes.map((route: any, index: number) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
 
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          return (
+            <TouchableOpacity
+              key={route.key}
+              onPress={onPress}
+              style={[styles.tabItem, isFocused && styles.activeTabItem]}>
+              {options.tabBarIcon &&
+                options.tabBarIcon({
+                  color: isFocused ? "#FFFFFF" : "#D5CDFE",
+                  size: 24,
+                  focused: isFocused,
+                })}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+};
+
+const Layout = () => {
   return (
     <Tabs
+      tabBar={CustomTabBar}
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          headerShown: false,
+          title: "Home",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home" color={color} size={size} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="search"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          headerShown: false,
+          title: "Search",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="magnify" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="saved"
+        options={{
+          headerShown: false,
+          title: "Saved",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="bookmark" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          headerShown: false,
+          title: "Profile",
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account" color={color} size={size} />
+          ),
         }}
       />
     </Tabs>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  tabBarContainer: {
+    position: "absolute",
+    bottom: 30,
+    left: 20,
+    right: 20,
+  },
+  tabBar: {
+    flexDirection: "row",
+    backgroundColor: "#2D276A",
+    borderRadius: 100,
+    height: 70,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    shadowColor: "#8C93FF",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "rgba(140, 147, 255, 0.2)",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 50,
+    marginHorizontal: 2,
+  },
+  activeTabItem: {
+    backgroundColor: "rgba(140, 147, 255, 0.4)",
+    shadowColor: "#8C93FF",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+});
+
+export default Layout;
