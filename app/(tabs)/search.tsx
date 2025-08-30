@@ -3,8 +3,9 @@ import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { getPopularMovies } from "@/services/api";
+import { updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 
 const Search = () => {
@@ -19,18 +20,35 @@ const Search = () => {
     reset,
   } = useFetch(() => getPopularMovies({ query: searchTerm }), false);
 
+  // Use refs to avoid dependency issues
+  const loadMoviesRef = useRef(loadMovies);
+  const resetRef = useRef(reset);
+
+  // Update refs when functions change
+  useEffect(() => {
+    loadMoviesRef.current = loadMovies;
+    resetRef.current = reset;
+  }, [loadMovies, reset]);
+
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (searchTerm.trim()) {
-        await loadMovies();
+        await loadMoviesRef.current();
         setHasSearched(true);
       } else {
-        reset();
+        resetRef.current();
         setHasSearched(false);
       }
-    }, 500);
+    }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, loadMovies, reset]);
+  }, [searchTerm]);
+
+  // Separate effect for updating search count when movies data changes
+  useEffect(() => {
+    if (movies?.[0]) {
+      updateSearchCount(searchTerm, movies[0]);
+    }
+  }, [movies, searchTerm]);
 
   return (
     <View className="flex-1 items-center justify-center bg-primary">
