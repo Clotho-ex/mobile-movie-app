@@ -5,15 +5,23 @@ import { images } from "@/constants/images";
 import { getPopularMovies } from "@/services/api";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
+import { useCallback } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 
 export default function Index() {
   const router = useRouter();
+
+  // Memoize the fetch function to prevent infinite loops
+  const fetchPopularMovies = useCallback(
+    () => getPopularMovies({ query: "" }),
+    []
+  );
+
   const {
     data: movies,
     loading: moviesLoading,
     error: moviesError,
-  } = useFetch(() => getPopularMovies({ query: "" }));
+  } = useFetch(fetchPopularMovies);
 
   const renderHeader = () => (
     <>

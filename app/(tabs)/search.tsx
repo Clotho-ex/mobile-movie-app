@@ -48,6 +48,7 @@ const Search = () => {
     if (movies?.[0]) {
       updateSearchCount(searchTerm, movies[0]);
     }
+    
   }, [movies, searchTerm]);
 
   return (

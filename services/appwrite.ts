@@ -19,6 +19,4 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
     //@ts-ignore
     Query.equal("searchTerm", query),
   ]);
-
-  console.log(result);
 };
