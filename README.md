@@ -10,7 +10,34 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. **Configure Environment Variables**
+
+   Create a `.env` file in the root directory with the following variables:
+
+   ```env
+   # TMDB (The Movie Database) API Configuration
+   EXPO_PUBLIC_MOVIE_API_KEY=your_tmdb_api_key_here
+
+   # Appwrite Database Configuration
+   EXPO_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+   EXPO_PUBLIC_APPWRITE_PROJECT_ID=your_appwrite_project_id
+   EXPO_PUBLIC_APPWRITE_DATABASE_ID=your_database_id
+   EXPO_PUBLIC_APPWRITE_COLLECTION_ID=your_collection_id
+   ```
+
+   **Required Setup:**
+
+   - Get your TMDB API key from [The Movie Database](https://www.themoviedb.org/settings/api)
+   - Set up an Appwrite project at [Appwrite Cloud](https://cloud.appwrite.io)
+   - Create a database and collection for search tracking
+   - Ensure your collection has the following attributes:
+     - `searchTerm` (string)
+     - `movie_id` (integer)
+     - `title` (string)
+     - `count` (integer)
+     - `poster_url` (string)
+
+3. Start the app
 
    ```bash
    npx expo start

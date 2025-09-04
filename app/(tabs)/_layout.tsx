@@ -1,9 +1,11 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 
-const CustomTabBar = ({ state, descriptors, navigation }: any) => {
+const CustomTabBar = ({ state, descriptors }: any) => {
+  const router = useRouter();
+
   return (
     <View style={styles.tabBarContainer}>
       <View style={styles.tabBar}>
@@ -12,14 +14,15 @@ const CustomTabBar = ({ state, descriptors, navigation }: any) => {
           const isFocused = state.index === index;
 
           const onPress = () => {
-            const event = navigation.emit({
-              type: "tabPress",
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
+            if (!isFocused) {
+              // Use Expo Router's navigation with proper route mapping
+              const routeMap: Record<string, any> = {
+                index: "/",
+                search: "/(tabs)/search",
+                saved: "/(tabs)/saved",
+                profile: "/(tabs)/profile",
+              };
+              router.push(routeMap[route.name] || "/");
             }
           };
 

@@ -3,14 +3,33 @@ import SearchBar from "@/components/SearchBar";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { getPopularMovies } from "@/services/api";
-import { updateSearchCount } from "@/services/appwrite";
+import { testDatabaseConnection, updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [lastSearchedTerm, setLastSearchedTerm] = useState("");
+
+  // Test database connection on component mount (for debugging)
+  useEffect(() => {
+    const checkDbConnection = async () => {
+      try {
+        const result = await testDatabaseConnection();
+        if (!result.success) {
+          console.warn(
+            "Database connection test failed. Search tracking may not work."
+          );
+        }
+      } catch (error) {
+        console.warn("Unable to test database connection:", error);
+      }
+    };
+
+    checkDbConnection();
+  }, []);
 
   const {
     data: movies,
@@ -20,36 +39,49 @@ const Search = () => {
     reset,
   } = useFetch(() => getPopularMovies({ query: searchTerm }), false);
 
-  // Use refs to avoid dependency issues
-  const loadMoviesRef = useRef(loadMovies);
-  const resetRef = useRef(reset);
+  const handleSearch = (text: string) => {
+    setSearchTerm(text);
+  };
 
-  // Update refs when functions change
-  useEffect(() => {
-    loadMoviesRef.current = loadMovies;
-    resetRef.current = reset;
-  }, [loadMovies, reset]);
-
+  // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (searchTerm.trim()) {
-        await loadMoviesRef.current();
         setHasSearched(true);
+        setLastSearchedTerm(searchTerm);
+        await loadMovies();
       } else {
-        resetRef.current();
         setHasSearched(false);
+        setLastSearchedTerm("");
+        reset();
       }
-    }, 1000);
+    }, 500);
+
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  // Separate effect for updating search count when movies data changes
+  // Effect to handle database writing after movies are loaded
   useEffect(() => {
-    if (movies?.[0]) {
-      updateSearchCount(searchTerm, movies[0]);
-    }
-    
-  }, [movies, searchTerm]);
+    const saveSearchToDatabase = async () => {
+      if (
+        lastSearchedTerm &&
+        movies &&
+        movies.length > 0 &&
+        movies[0] &&
+        !loading &&
+        !error
+      ) {
+        try {
+          await updateSearchCount(lastSearchedTerm, movies[0]);
+        } catch (dbError) {
+          console.warn("Failed to save search to database:", dbError);
+          // Don't throw error to avoid breaking the search functionality
+        }
+      }
+    };
+
+    saveSearchToDatabase();
+  }, [movies, lastSearchedTerm, loading, error]);
 
   return (
     <View className="flex-1 items-center justify-center bg-primary">
@@ -82,7 +114,7 @@ const Search = () => {
                   placeholder="Search for a movie"
                   onPress={() => {}}
                   value={searchTerm}
-                  onChangeText={(text: string) => setSearchTerm(text)}
+                  onChangeText={handleSearch}
                 />
               </View>
               {loading && (
@@ -99,8 +131,8 @@ const Search = () => {
               )}
               {!loading && !error && searchTerm.trim() && movies?.length && (
                 <Text className="text-white text-xl text-center font-bold mt-10 mb-10">
-                  Search Results for{" "}
-                  <Text className="text-accent ">{searchTerm}</Text>
+                  Showing Results for{"  "}
+                  <Text className="text-accent ">"{searchTerm}"</Text>
                 </Text>
               )}
             </>
