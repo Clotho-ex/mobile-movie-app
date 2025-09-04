@@ -5,13 +5,15 @@ import { images } from "@/constants/images";
 import { getPopularMovies } from "@/services/api";
 import { testDatabaseConnection, updateSearchCount } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
-  const [lastSearchedTerm, setLastSearchedTerm] = useState("");
+
+  // Use useRef to track saved search terms without causing re-renders
+  const savedSearchTermsRef = useRef<Set<string>>(new Set());
 
   // Test database connection on component mount (for debugging)
   useEffect(() => {
@@ -43,45 +45,58 @@ const Search = () => {
     setSearchTerm(text);
   };
 
+  const handleClear = () => {
+    setSearchTerm("");
+    setHasSearched(false);
+    reset();
+  };
+
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
       if (searchTerm.trim()) {
         setHasSearched(true);
-        setLastSearchedTerm(searchTerm);
-        await loadMovies();
+
+        // Only save to database if this exact search term hasn't been saved yet
+        const trimmedTerm = searchTerm.trim();
+        const shouldSaveToDb = !savedSearchTermsRef.current.has(trimmedTerm);
+
+        try {
+          await loadMovies();
+
+          // Save to database only once per unique search term per session
+          if (shouldSaveToDb) {
+            // Get fresh data for database saving
+            const searchResults = await getPopularMovies({
+              query: trimmedTerm,
+            });
+
+            if (searchResults && searchResults.length > 0 && searchResults[0]) {
+              try {
+                await updateSearchCount(trimmedTerm, searchResults[0]);
+                savedSearchTermsRef.current.add(trimmedTerm);
+                console.log(`Search "${trimmedTerm}" saved to database`);
+              } catch (dbError) {
+                console.warn("Failed to save search to database:", dbError);
+              }
+            }
+          } else {
+            console.log(
+              `Search "${trimmedTerm}" already saved in this session, skipping database write`
+            );
+          }
+        } catch (error) {
+          console.warn("Search operation failed:", error);
+        }
       } else {
         setHasSearched(false);
-        setLastSearchedTerm("");
         reset();
       }
     }, 500);
 
     return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
-
-  // Effect to handle database writing after movies are loaded
-  useEffect(() => {
-    const saveSearchToDatabase = async () => {
-      if (
-        lastSearchedTerm &&
-        movies &&
-        movies.length > 0 &&
-        movies[0] &&
-        !loading &&
-        !error
-      ) {
-        try {
-          await updateSearchCount(lastSearchedTerm, movies[0]);
-        } catch (dbError) {
-          console.warn("Failed to save search to database:", dbError);
-          // Don't throw error to avoid breaking the search functionality
-        }
-      }
-    };
-
-    saveSearchToDatabase();
-  }, [movies, lastSearchedTerm, loading, error]);
 
   return (
     <View className="flex-1 items-center justify-center bg-primary">
@@ -115,6 +130,7 @@ const Search = () => {
                   onPress={() => {}}
                   value={searchTerm}
                   onChangeText={handleSearch}
+                  onClear={handleClear}
                 />
               </View>
               {loading && (
@@ -132,7 +148,9 @@ const Search = () => {
               {!loading && !error && searchTerm.trim() && movies?.length && (
                 <Text className="text-white text-xl text-center font-bold mt-10 mb-10">
                   Showing Results for{"  "}
-                  <Text className="text-accent ">"{searchTerm}"</Text>
+                  <Text className="text-accent ">
+                    &ldquo;{searchTerm}&rdquo;
+                  </Text>
                 </Text>
               )}
             </>

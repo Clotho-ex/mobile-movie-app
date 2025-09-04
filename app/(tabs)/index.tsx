@@ -1,12 +1,21 @@
 import MovieCard from "@/components/MovieCard";
 import SearchBar from "@/components/SearchBar";
+import TrendingCard from "@/components/TrendingCard";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/images";
 import { getPopularMovies } from "@/services/api";
+import { getTrendingMovies } from "@/services/appwrite";
 import useFetch from "@/services/useFetch";
 import { useRouter } from "expo-router";
 import { useCallback } from "react";
-import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 
 export default function Index() {
   const router = useRouter();
@@ -16,6 +25,12 @@ export default function Index() {
     () => getPopularMovies({ query: "" }),
     []
   );
+
+  const {
+    data: trendingMovies,
+    loading: trendingLoading,
+    error: trendingError,
+  } = useFetch(getTrendingMovies);
 
   const {
     data: movies,
@@ -31,22 +46,47 @@ export default function Index() {
         resizeMode="contain"
       />
 
-      {moviesLoading ? (
+      {moviesLoading || trendingLoading ? (
         <ActivityIndicator
           size="large"
           color="#0000ff"
           className="mt-10 self-center"
         />
-      ) : moviesError ? (
-        <Text>Error: {moviesError?.message}</Text>
+      ) : moviesError || trendingError ? (
+        <Text>Error: {moviesError?.message || trendingError?.message}</Text>
       ) : (
         <View className="mt-10">
           <SearchBar
             onPress={() => router.push("/search")}
             placeholder="Search for a movie"
             value=""
-            onChangeText={() => {}}
+            onChangeText={() => router.push("/search")}
           />
+
+          {trendingMovies && trendingMovies.length > 0 && (
+            <View className="mt-10">
+              <Text className="text-white text-xl text-center font-bold mb-5">
+                🔥 Trending Searches
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{
+                  paddingHorizontal: 5,
+                  gap: 16,
+                }}
+                className="mb-10">
+                {trendingMovies.map((movie, index) => (
+                  <TrendingCard
+                    key={movie.movie_id}
+                    movie={movie}
+                    index={index}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           <Text className="text-white text-xl text-center font-bold mt-10 mb-10">
             Popular Movies
           </Text>

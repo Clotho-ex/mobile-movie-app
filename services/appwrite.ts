@@ -118,3 +118,35 @@ export const updateSearchCount = async (query: string, movie: Movie) => {
     throw error;
   }
 };
+
+export const getTrendingMovies = async (): Promise<
+  TrendingMovie[] | undefined
+> => {
+  try {
+    console.log("Fetching trending movies from database...");
+
+    const result = await database.listDocuments(DATABASE_ID, COLLECTION_ID, [
+      Query.orderDesc("count"),
+      Query.limit(5), // Get top 5 most searched movies
+    ]);
+
+    if (result.documents.length === 0) {
+      console.log("No trending movies found in database");
+      return [];
+    }
+
+    const trendingMovies: TrendingMovie[] = result.documents.map((doc) => ({
+      searchTerm: doc.searchTerm,
+      movie_id: doc.movie_id,
+      title: doc.title,
+      count: doc.count,
+      poster_url: doc.poster_url,
+    }));
+
+    console.log(`Retrieved ${trendingMovies.length} trending movies`);
+    return trendingMovies;
+  } catch (error) {
+    console.error("Failed to fetch trending movies:", error);
+    return undefined;
+  }
+};
