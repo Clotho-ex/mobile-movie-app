@@ -26,6 +26,31 @@ export const getPopularMovies = async ({ query }: { query: string }) => {
   return data.results;
 };
 
+export const getMovieDetails = async (
+  movieId: string
+): Promise<MovieDetails> => {
+  try {
+    const response = await fetch(
+      `${TMDB_CONFIG.BASE_URL}/movie/${movieId}?api_key=${TMDB_CONFIG.API_KEY}`,
+      {
+        method: "GET",
+        headers: TMDB_CONFIG.headers,
+      }
+    );
+
+    if (!response.ok) {
+      //@ts-ignore
+      throw new Error("Failed to fetch movie details", response.statusText);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch movie details:", error);
+    throw error;
+  }
+};
+
 // const url =
 //   "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc";
 //const options = {

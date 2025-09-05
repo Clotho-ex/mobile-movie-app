@@ -9,10 +9,12 @@ interface TrendingCardProps {
 
 const TrendingCard = ({ movie, index }: TrendingCardProps) => {
   return (
-    <TouchableOpacity className="w-32 mb-5 relative" activeOpacity={0.8}>
+    <TouchableOpacity className="w-36 mb-5 relative" activeOpacity={0.8}>
       {/* Ranking Badge */}
       <View className="absolute top-2 left-2 z-10 bg-accent rounded-full w-6 h-6 items-center justify-center">
-        <Text className="text-white text-xs font-bold">{index + 1}</Text>
+        <Text className="text-text-primary-light dark:text-text-primary-dark text-xs font-bold">
+          {index + 1}
+        </Text>
       </View>
 
       {/* Movie Poster */}
@@ -22,34 +24,41 @@ const TrendingCard = ({ movie, index }: TrendingCardProps) => {
             movie.poster_url ||
             `https://placehold.co/600x400/1a1a1a/ffffff.png`,
         }}
-        className="w-full h-44 rounded-lg"
+        className="w-full h-48 rounded-lg"
         resizeMode="cover"
       />
 
       {/* Movie Title */}
       <Text
-        className="text-white text-sm font-bold mt-2 text-center"
+        className="text-text-primary-light dark:text-text-primary-dark text-sm font-bold mt-4 text-center"
         numberOfLines={1}>
         {movie.title}
       </Text>
 
       {/* Search Stats */}
-      <View className="flex-row items-center justify-between gap-2 mt-2">
+      <View className="flex-row items-center justify-center gap-2 mt-2">
         <View className="flex-row items-center justify-start gap-2">
           <MaterialCommunityIcons
             name="trending-up"
             size={16}
-            color="#FF5600"
+            color="#7C3AED"
             resizeMode="contain"
           />
-          <Text className="text-accent text-sm font-bold">{movie.count}</Text>
+          <Text className="text-text-accent-light dark:text-text-accent-dark text-sm font-bold">
+            {movie.count}
+          </Text>
         </View>
-        <Text className="text-light-300 text-xs font-bold">searches</Text>
+        <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold">
+          {" "}
+          searches
+        </Text>
       </View>
 
       {/* Search Term Badge */}
-      <View className="mt-1 bg-dark-100 rounded-full px-2 py-1">
-        <Text className="text-light-300 text-xs text-center" numberOfLines={1}>
+      <View className="mt-1 bg-surface-light dark:bg-surface-dark rounded-full px-2 py-1">
+        <Text
+          className="text-text-secondary-light dark:text-text-secondary-dark text-xs text-center"
+          numberOfLines={1}>
           &quot;{movie.searchTerm}&quot;
         </Text>
       </View>

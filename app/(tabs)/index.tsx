@@ -53,7 +53,9 @@ export default function Index() {
           className="mt-10 self-center"
         />
       ) : moviesError || trendingError ? (
-        <Text>Error: {moviesError?.message || trendingError?.message}</Text>
+        <Text className="text-red-500 dark:text-red-400 text-center mt-10">
+          Error: {moviesError?.message || trendingError?.message}
+        </Text>
       ) : (
         <View className="mt-10">
           <SearchBar
@@ -65,7 +67,7 @@ export default function Index() {
 
           {trendingMovies && trendingMovies.length > 0 && (
             <View className="mt-10">
-              <Text className="text-white text-xl text-center font-bold mb-5">
+              <Text className="text-text-primary-light dark:text-text-primary-dark text-xl text-center font-bold mb-5">
                 🔥 Trending Searches
               </Text>
               <ScrollView
@@ -73,9 +75,9 @@ export default function Index() {
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
                   paddingHorizontal: 5,
-                  gap: 16,
+                  gap: 20,
                 }}
-                className="mb-10">
+                className="mb-2">
                 {trendingMovies.map((movie, index) => (
                   <TrendingCard
                     key={movie.movie_id}
@@ -87,7 +89,7 @@ export default function Index() {
             </View>
           )}
 
-          <Text className="text-white text-xl text-center font-bold mt-10 mb-10">
+          <Text className="text-text-primary-light dark:text-text-primary-dark text-xl text-center font-bold mt-5 mb-10">
             Popular Movies
           </Text>
         </View>
@@ -100,7 +102,7 @@ export default function Index() {
   );
 
   return (
-    <View className="flex-1 items-center justify-center bg-primary">
+    <View className="flex-1 items-center justify-center bg-background-light dark:bg-background-dark">
       <Image
         source={images.bg}
         className="w-full h-full absolute z-0"

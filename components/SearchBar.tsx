@@ -27,20 +27,20 @@ const SearchBar = ({
   };
 
   return (
-    <View className="flex-row items-center rounded-full px-5 py-4 gap-2 bg-dark-100 w-80 mx-auto">
+    <View className="flex-row items-center rounded-full px-5 py-4 gap-2 bg-surface-light dark:bg-surface-dark w-80 mx-auto">
       <MaterialCommunityIcons
         name="magnify"
         size={24}
-        color="#D5CDFE"
+        color="#9CA3AF"
         resizeMode="contain"
       />
       <TextInput
         placeholder={placeholder}
-        placeholderTextColor="white"
+        placeholderTextColor="#9CA3AF"
         onChangeText={onChangeText}
         onPress={onPress}
         value={value}
-        className="flex-1 ml-2 font-medium text-white"
+        className="flex-1 ml-2 font-medium text-text-primary-light dark:text-text-primary-dark"
       />
       {value.trim().length > 0 && (
         <TouchableOpacity
@@ -50,7 +50,7 @@ const SearchBar = ({
           <MaterialCommunityIcons
             name="close-circle"
             size={20}
-            color="#D5CDFE"
+            color="#9CA3AF"
           />
         </TouchableOpacity>
       )}

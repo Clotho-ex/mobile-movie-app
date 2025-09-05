@@ -99,7 +99,7 @@ const Search = () => {
   }, [searchTerm]);
 
   return (
-    <View className="flex-1 items-center justify-center bg-primary">
+    <View className="flex-1 items-center justify-center bg-background-light dark:bg-background-dark">
       <Image
         source={images.bg}
         className="w-full h-full absolute z-0"
@@ -141,14 +141,14 @@ const Search = () => {
                 />
               )}
               {error && (
-                <Text className="text-red-500 px-5 my-5 text-center">
+                <Text className="text-red-500 dark:text-red-400 px-5 my-5 text-center">
                   Error: {error?.message}
                 </Text>
               )}
               {!loading && !error && searchTerm.trim() && movies?.length && (
-                <Text className="text-white text-xl text-center font-bold mt-10 mb-10">
+                <Text className="text-text-primary-light dark:text-text-primary-dark text-xl text-center font-bold mt-10 mb-10">
                   Showing Results for{"  "}
-                  <Text className="text-accent ">
+                  <Text className="text-text-accent-light dark:text-text-accent-dark ">
                     &ldquo;{searchTerm}&rdquo;
                   </Text>
                 </Text>
@@ -160,11 +160,11 @@ const Search = () => {
               <View className="mt-10 mb-10">
                 <Text className="text-center text-xl font-bold">
                   {searchTerm.trim() && hasSearched ? (
-                    <Text className="text-[#FF5600]">
+                    <Text className="text-orange-600 dark:text-orange-500">
                       We don&apos;t have that movie
                     </Text>
                   ) : (
-                    <Text className="text-white/50">
+                    <Text className="text-text-secondary-light dark:text-text-primary-dark/50">
                       Get your snacks ready!
                     </Text>
                   )}

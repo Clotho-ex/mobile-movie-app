@@ -23,25 +23,23 @@ const MovieCard = ({
           resizeMode="cover"
         />
         <Text
-          className="text-white text-sm font-bold mt-2 text-center"
+          className="text-text-primary-light dark:text-text-primary-dark text-sm font-bold mt-2 text-center"
           numberOfLines={1}>
           {title}
         </Text>
-        <View className="flex-row items-center justify-between gap-2 mt-2">
-          <View className="flex-row items-center justify-start gap-2">
-            <Text className="text-white text-sm font-bold text-center">
+        <View className="flex-row items-center gap-x-2 mt-2">
+          <View className="flex-1 flex-row items-center justify-center bg-surface-light dark:bg-surface-dark px-2 py-1.5 rounded-lg">
+            <MaterialCommunityIcons name="star" size={12} color="#7C3AED" />
+            <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium ml-1">
               {vote_average?.toFixed(1) || "N/A"}
             </Text>
-            <MaterialCommunityIcons
-              name="star"
-              size={16}
-              color="#FFD700"
-              resizeMode="contain"
-            />
           </View>
-          <Text className="text-light-300 text-xs font-bold">
-            {release_date?.split("-")[0] || "N/A"}
-          </Text>
+          <View className="flex-1 flex-row items-center justify-center bg-surface-light dark:bg-surface-dark px-2 py-1.5 rounded-lg">
+            <MaterialCommunityIcons name="calendar" size={12} color="#7C3AED" />
+            <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-medium ml-1">
+              {release_date?.split("-")[0] || "N/A"}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
     </Link>
