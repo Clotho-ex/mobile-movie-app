@@ -37,30 +37,20 @@ const TrendingCard = ({ movie, index }: TrendingCardProps) => {
 
       {/* Search Stats */}
       <View className="flex-row items-center justify-center gap-2 mt-2">
-        <View className="flex-row items-center justify-start gap-2">
+        <View className="flex-row items-center gap-1 bg-surface-light dark:bg-surface-dark px-3 py-2 rounded-lg">
           <MaterialCommunityIcons
             name="trending-up"
-            size={16}
+            size={12}
             color="#7C3AED"
             resizeMode="contain"
           />
-          <Text className="text-text-accent-light dark:text-text-accent-dark text-sm font-bold">
+          <Text className="text-text-accent-light dark:text-text-accent-dark text-md font-medium">
             {movie.count}
           </Text>
+          <Text className="text-text-secondary-light dark:text-text-secondary-dark ml-2 text-md font-medium">
+            searches
+          </Text>
         </View>
-        <Text className="text-text-secondary-light dark:text-text-secondary-dark text-xs font-bold">
-          {" "}
-          searches
-        </Text>
-      </View>
-
-      {/* Search Term Badge */}
-      <View className="mt-1 bg-surface-light dark:bg-surface-dark rounded-full px-2 py-1">
-        <Text
-          className="text-text-secondary-light dark:text-text-secondary-dark text-xs text-center"
-          numberOfLines={1}>
-          &quot;{movie.searchTerm}&quot;
-        </Text>
       </View>
     </TouchableOpacity>
   );
